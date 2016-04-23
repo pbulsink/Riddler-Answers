@@ -1,0 +1,6 @@
+*.RData
+*.rdb
+*_cache/
+*.dcf
+*.png
+*.html
