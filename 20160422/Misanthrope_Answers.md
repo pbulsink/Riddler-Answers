@@ -15,6 +15,7 @@ Extra credit: It’s been a while, so let’s offer up a 🏆 Coolest Riddler Ex
 
 ##My Answer##
 *See this answer with charts on [RPubs](http://rpubs.com/pbulsink/misanthropes)*
+
 While I'm sure there's a way of solving this explicitly, I'm going to ty a nmerical brute force using Monte-Carlo like techniques. By solving for 1000 houses over and over and over, we'll get a distribution of results, between 0.33 and 0.50 occupied. 
 
 Immediately, there's a question. Are the first house and last house on the block neighbours? Are the houses in a row, or are they around a square block, where everyone has two neighbours? That will change our results, of course. I'll work on the linear set first.
@@ -233,8 +234,8 @@ lm_results$result <- lm_results$result - as.integer(mean(lm_results$result))
 
 all_results <- rbind(linear_results, circular_results, lm_results)
 
-ggplot(all_results, aes(x = result, ..density.., fill = type)) + geom_histogram(alpha = 0.3, 
-    position = "identity", binwidth = 1) + ggtitle("Histogram of Linear, Circular and Less Misanthropic Calculations") + 
+ggplot(all_results, aes(x = result, ..density.., color = type)) + geom_freqpoly(binwidth = 1) + 
+    ggtitle("Histogram of Linear, Circular and Less Misanthropic Calculations") + 
     xlab("Difference in Number of Occupied Houses from Mean") + ylab("Density")
 ```
 
