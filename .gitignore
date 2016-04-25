@@ -2,3 +2,5 @@
 *.rdb
 *_cache/
 *.dcf
+*.lp
+

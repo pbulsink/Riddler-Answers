@@ -1,0 +1,86 @@
+# Space Race
+Philip Bulsink  
+April 15, 2016  
+
+
+
+##You Have $1 Billion To Win A Space Race. Go.##
+
+From [http://fivethirtyeight.com/features/you-have-1-billion-to-win-a-space-race-go/](http://fivethirtyeight.com/features/you-have-1-billion-to-win-a-space-race-go/)
+
+You are the CEO of a space transport company in the year 2080, and your chief scientist comes in to tell you that one of your space probes has detected an alien artifact at the Jupiter Solar Lagrangian (L2) point.
+
+You want to be the first to get to it! But you know that the story will leak soon and you only have a short time to make critical decisions. With standard technology available to anyone with a few billion dollars, a manned rocket can be quickly assembled and arrive at the artifact in 1,600 days. But with some nonstandard items you can reduce that time and beat the competition. Your accountants tell you that they can get you an immediate line of credit of $1 billion.
+
+You can buy:
+
+1. Big Russian engines. There are only three in the world and the Russians want $400 million for each of them. Buying one will reduce the trip time by 200 days. Buying two will allow you to split your payload and will save another 100 days.
+
+2. NASA ion engines. There are only eight of these $140 million large-scale engines in the world. Each will consume 5,000 kilograms of xenon during the trip. There are 30,000 kg of xenon available worldwide at a price of $2,000/kg, so 5,000 kg costs $10 million. Bottom line: For each $150 million fully fueled xenon engine you buy, you can take 50 days off of the trip.
+
+3. Light payloads. For $50 million each, you can send one of four return flight fuel tanks out ahead of the mission, using existing technology. Each time you do this, you lighten the main mission and reduce the arrival time by 25 days.
+
+*What's your best strategy to get there first?*
+
+##My Answer##
+*See this answer with charts on [RPubs](http://rpubs.com/pbulsink/space_race)*
+
+There's a few ways to look at this problem. First, what's the fastest we can get there? Second, what's the best way to slow down the other team while you're travelling? For question two, we'll assume they have the same advantages from each technology that we do.
+
+###Question One: Getting There Fastest###
+This is a simple optimization question. The base time is 1600 days. So, we have:
+
+$$TravelTime = 1600 - (RussianEngine1)*200 - (RussianEngine2)*100 - (IonEngine)*50 - (ReturnFuel)*25$$
+
+Now, of course, there are limitations on the amount of supplies in the world:  
+$$RussianEngine2 <= RussianEngine1 $$
+
+$$RussianEngine1 + RussianEngine2 <= 3$$
+
+*Note: there are three Russian engines, but we only have the ability to use two of them.*
+
+$$IonEngine <= 8$$
+
+$$ReturnFuel <= 4$$
+
+And there are limitations in the amount of money we have. we'll talk about dollars in 'millions':
+
+$$1000 >= (RussianEngine1+RussianEngine2)*400 + (IonEngine)*150 + (ReturnFuel)*50$$
+
+Let's do some optimizing!
+
+Obviously, there aren't that many combinations that supply these parameters. But, instead of figuring them all out ourselves, we'll let the computer solve it. Then, we could change our budget, or the number of engines available, and not have to rework everything manually. We'll switch around our first formula as well, and look to 'maximize' the days saved, instead of minimize travel time. Same process, in essence, but easier to program now.
+
+
+```r
+library(lpSolveAPI)
+
+lps.model <- make.lp(0, 4)
+add.constraint(lps.model, c(400, 400, 150, 50), "<=", 1000)  #Cost
+add.constraint(lps.model, c(1, 0, 0, 0), "<=", 1)  #RussianEngine1
+add.constraint(lps.model, c(0, 1, 0, 0), "<=", 1)  #RussianEngine2
+# There are three Russian Engines but we can only use two of them.
+add.constraint(lps.model, c(1, -1, 0, 0), ">=", 0)  #Russian Engine in order
+add.constraint(lps.model, c(0, 0, 1, 0), "<=", 8)  #Ion Engine
+add.constraint(lps.model, c(0, 0, 0, 1), "<=", 4)  #Return Fuels
+
+set.objfn(lps.model, c(200, 100, 50, 25))
+set.type(lps.model, c(1:4), "integer")
+lp.control(lps.model, sense = "max")
+
+write.lp(lps.model, "model.lp", type = "lp")
+```
+
+Now, with our model prepared, we can solve for it.
+
+
+```r
+solve(lps.model)
+res <- get.variables(lps.model)
+print(res)
+```
+
+So, the best way to use our money to get to the Juipter L2 point quickly is: 1 Russian engines for speed, 0 Russian engines to split the load, 3 NASA ion engines, and 3 return fuel shipments.
+
+This will get us there in 1175 days.
+
