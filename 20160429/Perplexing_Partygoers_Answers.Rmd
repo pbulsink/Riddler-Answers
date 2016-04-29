@@ -34,7 +34,7 @@ Take a person $A$, with two friends $B$ and $C$. $A$ has two friends, but since 
 
 Now, you can draw parallels with $D$, $E$, and $F$, and so on. Thus, $1/3$ of your guests are proud in this situation. 
 
-So, as n goes to infinity, the number pf proud people approaches $1/3*n$
+So, as n goes to infinity, the number of proud people approaches $1/3*n$
 
 Note that the question doesn't specify that the guests are your own friends. If that was the case, it would be $1/n$, that is, yourself.
 
